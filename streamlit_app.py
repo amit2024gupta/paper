@@ -38,7 +38,7 @@ if os.getenv("ENABLE_LOGGING", "false").lower() == "true":
     logger.info(f"Logging to: {log_filename}")
 
 # Configure Gemini API
-genai.configure(api_key="AIzaSyB_cNSUmfNKahsm39hr7xPbXxNCta-GC50")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Initialize the model with safety settings
 generation_config = {
