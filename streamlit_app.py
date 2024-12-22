@@ -110,19 +110,19 @@ def generate_single_paper(subject: str) -> str:
         # Construct prompts for each section
         mcq_prompt = (
             f"Generate {template['mcq']} multiple-choice questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}"
+            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
         )
         fill_blanks_prompt = (
             f"Generate {template['fill']} fill-in-the-blank questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}"
+            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
         )
         small_questions_prompt = (
             f"Generate {template['small']} small answer questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}"
+            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
         )
         big_questions_prompt = (
             f"Generate {template['big']} long answer questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}"
+            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
         )
 
         # Generate sections using cached function
@@ -320,7 +320,7 @@ def create_test_paper():
         st.session_state.downloads = []
     
     # Initialize these as global variables
-    global template, difficulty_dist, class_selected, subjects_selected, difficulty
+    global template, difficulty_dist, class_selected, subjects_selected, difficulty, topics
     
     # Add templates
     template = add_paper_templates()
@@ -362,9 +362,9 @@ def create_test_paper():
     num_big_qs = template["big"]
     
     # Optional custom format
-    custom_format = st.text_area(
-        "Provide Existing Format (Optional):",
-        placeholder="Paste your existing test format here..."
+    topics = st.text_input(
+        "Provide any Custom Topics (Optional):",
+        placeholder="Addition, Photosythesis,..."
     )
     
     # Calculate time and marks
