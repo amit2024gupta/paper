@@ -110,19 +110,19 @@ def generate_single_paper(subject: str) -> str:
         # Construct prompts for each section
         mcq_prompt = (
             f"Generate {template['mcq']} multiple-choice questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
+            f"Subject: {subject}. Difficulty: {difficulty}, Only Topics: {topics}"
         )
         fill_blanks_prompt = (
             f"Generate {template['fill']} fill-in-the-blank questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
+            f"Subject: {subject}. Difficulty: {difficulty}, Only Topics: {topics}"
         )
         small_questions_prompt = (
             f"Generate {template['small']} small answer questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
+            f"Subject: {subject}. Difficulty: {difficulty}, Only Topics: {topics}"
         )
         big_questions_prompt = (
             f"Generate {template['big']} long answer questions for Class {class_selected}, "
-            f"Subject: {subject}. Difficulty: {difficulty}, use only topics : {topics}"
+            f"Subject: {subject}. Difficulty: {difficulty}, Only Topics: {topics}"
         )
 
         # Generate sections using cached function
@@ -183,17 +183,6 @@ def generate_answer_key(paper_content):
     1. Detailed evaluation criteria and sample answer
     """
     return generate_text(prompt, temperature=0.3)
-
-def add_difficulty_distribution():
-    st.sidebar.subheader("Question Difficulty Distribution")
-    easy = st.sidebar.slider("Easy Questions (%)", 0, 100, 30)
-    medium = st.sidebar.slider("Medium Questions (%)", 0, 100, 40)
-    hard = st.sidebar.slider("Hard Questions (%)", 0, 100, 30)
-    
-    total = easy + medium + hard
-    if total != 100:
-        return None
-    return {"easy": easy, "medium": medium, "hard": hard}
 
 def calculate_time_duration(num_mcq, num_fill_blanks, num_small_qs, num_big_qs):
     """Calculate recommended time duration for the test"""
@@ -320,16 +309,10 @@ def create_test_paper():
         st.session_state.downloads = []
     
     # Initialize these as global variables
-    global template, difficulty_dist, class_selected, subjects_selected, difficulty, topics
+    global template, class_selected, subjects_selected, difficulty, topics
     
     # Add templates
     template = add_paper_templates()
-    
-    # Add difficulty distribution
-    difficulty_dist = add_difficulty_distribution()
-    if not difficulty_dist:
-        st.error("Please adjust difficulty distribution to total 100%")
-        return
     
     # Define default subjects
     default_subjects = [
@@ -343,7 +326,7 @@ def create_test_paper():
     
     # Original inputs
     class_selected = st.selectbox("Select Class:", ["4th", "5th", "6th", "7th", "8th", "9th", "10th"])
-    subjects_selected = st.multiselect("Select Subject(s):", options=default_subjects)
+    subjects_selected = st.selectbox("Select Subject(s):", options=default_subjects)
     
     # Difficulty level
     difficulty = st.radio("Select Difficulty Level:", ["Easy", "Moderate", "Difficult"])
@@ -361,11 +344,22 @@ def create_test_paper():
     num_small_qs = template["small"]
     num_big_qs = template["big"]
     
+    num_mcq = st.slider("MCQ Questions", 0, 20, num_mcq)
+    num_fill_blanks = st.slider("Fill in the blanks", 0, 20, num_fill_blanks)
+    num_small_qs = st.slider("Small Questions", 0, 10, num_small_qs)
+    num_big_qs = st.slider("Small Questions", 0, 5, num_big_qs)
+
     # Optional custom format
     topics = st.text_input(
-        "Provide any Custom Topics (Optional):",
-        placeholder="Addition, Photosythesis,..."
+        "Provide Topics for selected subjects (Optional):",
+        placeholder="Addition, Photosynthesis, ..."
     )
+    
+    # Optional custom format
+    # custom_format = st.text_area(
+    #    "Provide Existing Format (Optional):",
+    #    placeholder="Paste your existing test format here..."
+    #)
     
     # Calculate time and marks
     time_duration = calculate_time_duration(num_mcq, num_fill_blanks, 
@@ -472,7 +466,6 @@ def create_test_paper():
 class SessionState:
     def __init__(self):
         self.template = None
-        self.difficulty_dist = None
         self.class_selected = None
         self.subjects_selected = None
         self.difficulty = None
